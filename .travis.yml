@@ -41,60 +41,49 @@ before_script: |
 script: ./ci/build.sh
 
 deploy:
-  - provider: releases
+  - &release
+    provider: releases
     skip_cleanup: true
     api_key:
       secure: "CY9QCD1XsYfwqi/qbBNhvnGzL2HNxg09HuoBoHMJt/gBY1LdnF0o3YLazkzLZr83AvWjnqNcUv1M5At8YGEpF8DPsqwqyAKWXLSx8Oqa72uScspN6GUeUkOnpA5BuYjIY/Xk3KuABmHnZgUpP94WC9UGcitAfK8QxTb88E4bulCj9g+LMlTKTk1WNMLkwPmjkEz1nK6+65hxyRhHnkhKgXcJ/9ImOozzNth7q0lszPnVmYNA1sSknDT3ETBpru6CTjOhOEcXj1rfOVjVzl1zguupS28t1KDz3yLThEJCxqpIZUyPjIsqlYbh8T5uBZ1uXy5VtByvWU5CzDpLwQzJZEttOtSbOuwvT8nSD1iEzDQjn+Q+1Y+tnPToJSQpXxCgmvg3btWkXmMuTHew9spAfbafQI8VC0E8331gR4z2Jx2f82avM13qyaNNSgTnWIPerdBq52/nju+HQ+cP4Ph4HEJdaNxRQjhmWQpxvNo9AHKyHFCMw4+ENq+yIqGfAaMCrjHqZ+TyFGqJ+XjcLsbBmksBvsYdPo99tSQO+sXjEsW2GD0MOleFBSTz2TvBPmMqjZYE17aJYKKQgDACyEcNZ24Vy6PTCImRGbz1ipgRgL6X9gZRyFqZredJTC8LzU+0HvzJX1yFgPxFMmqS0K5V981BOEZxykIqgUMctX6oyrU="
+    on: &release-on
+      tags: true
+      repo: involucro/involucro
+
+  - <<: *release
     file:
       - involucro
     on:
-      tags: true
-      repo: involucro/involucro
+      <<: *release-on
       condition: $MODE = unit && $TRAVIS_OS_NAME = linux
 
-  - provider: releases
-    skip_cleanup: true
-    api_key:
-      secure: "CY9QCD1XsYfwqi/qbBNhvnGzL2HNxg09HuoBoHMJt/gBY1LdnF0o3YLazkzLZr83AvWjnqNcUv1M5At8YGEpF8DPsqwqyAKWXLSx8Oqa72uScspN6GUeUkOnpA5BuYjIY/Xk3KuABmHnZgUpP94WC9UGcitAfK8QxTb88E4bulCj9g+LMlTKTk1WNMLkwPmjkEz1nK6+65hxyRhHnkhKgXcJ/9ImOozzNth7q0lszPnVmYNA1sSknDT3ETBpru6CTjOhOEcXj1rfOVjVzl1zguupS28t1KDz3yLThEJCxqpIZUyPjIsqlYbh8T5uBZ1uXy5VtByvWU5CzDpLwQzJZEttOtSbOuwvT8nSD1iEzDQjn+Q+1Y+tnPToJSQpXxCgmvg3btWkXmMuTHew9spAfbafQI8VC0E8331gR4z2Jx2f82avM13qyaNNSgTnWIPerdBq52/nju+HQ+cP4Ph4HEJdaNxRQjhmWQpxvNo9AHKyHFCMw4+ENq+yIqGfAaMCrjHqZ+TyFGqJ+XjcLsbBmksBvsYdPo99tSQO+sXjEsW2GD0MOleFBSTz2TvBPmMqjZYE17aJYKKQgDACyEcNZ24Vy6PTCImRGbz1ipgRgL6X9gZRyFqZredJTC8LzU+0HvzJX1yFgPxFMmqS0K5V981BOEZxykIqgUMctX6oyrU="
+  - <<: *release
     file:
       - involucro.darwin
     on:
-      tags: true
-      repo: involucro/involucro
+      <<: *release-on
       condition: $MODE = unit && $TRAVIS_OS_NAME = osx
 
-  - provider: releases
-    skip_cleanup: true
-    api_key:
-      secure: "CY9QCD1XsYfwqi/qbBNhvnGzL2HNxg09HuoBoHMJt/gBY1LdnF0o3YLazkzLZr83AvWjnqNcUv1M5At8YGEpF8DPsqwqyAKWXLSx8Oqa72uScspN6GUeUkOnpA5BuYjIY/Xk3KuABmHnZgUpP94WC9UGcitAfK8QxTb88E4bulCj9g+LMlTKTk1WNMLkwPmjkEz1nK6+65hxyRhHnkhKgXcJ/9ImOozzNth7q0lszPnVmYNA1sSknDT3ETBpru6CTjOhOEcXj1rfOVjVzl1zguupS28t1KDz3yLThEJCxqpIZUyPjIsqlYbh8T5uBZ1uXy5VtByvWU5CzDpLwQzJZEttOtSbOuwvT8nSD1iEzDQjn+Q+1Y+tnPToJSQpXxCgmvg3btWkXmMuTHew9spAfbafQI8VC0E8331gR4z2Jx2f82avM13qyaNNSgTnWIPerdBq52/nju+HQ+cP4Ph4HEJdaNxRQjhmWQpxvNo9AHKyHFCMw4+ENq+yIqGfAaMCrjHqZ+TyFGqJ+XjcLsbBmksBvsYdPo99tSQO+sXjEsW2GD0MOleFBSTz2TvBPmMqjZYE17aJYKKQgDACyEcNZ24Vy6PTCImRGbz1ipgRgL6X9gZRyFqZredJTC8LzU+0HvzJX1yFgPxFMmqS0K5V981BOEZxykIqgUMctX6oyrU="
+  - <<: *release
     file:
       - involucro32.exe
       - involucro.exe
     on:
-      tags: true
-      repo: involucro/involucro
+      <<: *release-on
       condition: $MODE = windows-build
 
-  - provider: releases
-    skip_cleanup: true
-    api_key:
-      secure: "CY9QCD1XsYfwqi/qbBNhvnGzL2HNxg09HuoBoHMJt/gBY1LdnF0o3YLazkzLZr83AvWjnqNcUv1M5At8YGEpF8DPsqwqyAKWXLSx8Oqa72uScspN6GUeUkOnpA5BuYjIY/Xk3KuABmHnZgUpP94WC9UGcitAfK8QxTb88E4bulCj9g+LMlTKTk1WNMLkwPmjkEz1nK6+65hxyRhHnkhKgXcJ/9ImOozzNth7q0lszPnVmYNA1sSknDT3ETBpru6CTjOhOEcXj1rfOVjVzl1zguupS28t1KDz3yLThEJCxqpIZUyPjIsqlYbh8T5uBZ1uXy5VtByvWU5CzDpLwQzJZEttOtSbOuwvT8nSD1iEzDQjn+Q+1Y+tnPToJSQpXxCgmvg3btWkXmMuTHew9spAfbafQI8VC0E8331gR4z2Jx2f82avM13qyaNNSgTnWIPerdBq52/nju+HQ+cP4Ph4HEJdaNxRQjhmWQpxvNo9AHKyHFCMw4+ENq+yIqGfAaMCrjHqZ+TyFGqJ+XjcLsbBmksBvsYdPo99tSQO+sXjEsW2GD0MOleFBSTz2TvBPmMqjZYE17aJYKKQgDACyEcNZ24Vy6PTCImRGbz1ipgRgL6X9gZRyFqZredJTC8LzU+0HvzJX1yFgPxFMmqS0K5V981BOEZxykIqgUMctX6oyrU="
+  - <<: *release
     file:
       - involucro.linux-arm64
     on:
-      tags: true
-      repo: involucro/involucro
+      <<: *release-on
       condition: $MODE = cross-arm64
 
-  - provider: releases
-    skip_cleanup: true
-    api_key:
-      secure: "CY9QCD1XsYfwqi/qbBNhvnGzL2HNxg09HuoBoHMJt/gBY1LdnF0o3YLazkzLZr83AvWjnqNcUv1M5At8YGEpF8DPsqwqyAKWXLSx8Oqa72uScspN6GUeUkOnpA5BuYjIY/Xk3KuABmHnZgUpP94WC9UGcitAfK8QxTb88E4bulCj9g+LMlTKTk1WNMLkwPmjkEz1nK6+65hxyRhHnkhKgXcJ/9ImOozzNth7q0lszPnVmYNA1sSknDT3ETBpru6CTjOhOEcXj1rfOVjVzl1zguupS28t1KDz3yLThEJCxqpIZUyPjIsqlYbh8T5uBZ1uXy5VtByvWU5CzDpLwQzJZEttOtSbOuwvT8nSD1iEzDQjn+Q+1Y+tnPToJSQpXxCgmvg3btWkXmMuTHew9spAfbafQI8VC0E8331gR4z2Jx2f82avM13qyaNNSgTnWIPerdBq52/nju+HQ+cP4Ph4HEJdaNxRQjhmWQpxvNo9AHKyHFCMw4+ENq+yIqGfAaMCrjHqZ+TyFGqJ+XjcLsbBmksBvsYdPo99tSQO+sXjEsW2GD0MOleFBSTz2TvBPmMqjZYE17aJYKKQgDACyEcNZ24Vy6PTCImRGbz1ipgRgL6X9gZRyFqZredJTC8LzU+0HvzJX1yFgPxFMmqS0K5V981BOEZxykIqgUMctX6oyrU="
+  - <<: *release
     file:
       - involucro.linux-arm32
     on:
-      tags: true
-      repo: involucro/involucro
+      <<: *release-on
       condition: $MODE = cross-arm
 
   - provider: script
