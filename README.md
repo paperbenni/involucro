@@ -46,7 +46,6 @@ As binary for Linux:
 
 Or, for Windows:
 [involucro.exe](https://github.com/involucro/involucro/releases/download/latest/involucro.exe)
-[involucro32.exe](https://github.com/involucro/involucro/releases/download/latest/involucro32.exe)
 
 And for Mac OSX:
 [involucro.darwin](https://github.com/involucro/involucro/releases/download/latest/involucro.darwin)

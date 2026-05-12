@@ -9,20 +9,23 @@ if [[ "$MODE" == "unit" ]]; then
     go test -v -short "${PKGS[@]}"
 fi
 
-if [[ "$MODE" == "windows-build" ]]; then
+if [[ "$MODE" == "windows-amd64" ]]; then
     go get -u github.com/josephspurrier/goversioninfo/cmd/goversioninfo
     "$GOPATH"/bin/goversioninfo "-product-version=$VERSION"
 
     CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o involucro.exe -ldflags "$LDFLAGS" ./cmd/involucro
-    CGO_ENABLED=0 GOOS=windows GOARCH=386 go build -o involucro32.exe -ldflags "$LDFLAGS" ./cmd/involucro
-    file involucro.exe involucro32.exe
+    file involucro.exe
 
-elif [[ "$MODE" == "cross-arm64" ]]; then
-    CGO_ENABLED=0 GOARCH=arm64 go build -o "$FILENAME" -ldflags "$LDFLAGS" ./cmd/involucro
+elif [[ "$MODE" == "linux-amd64" ]]; then
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$FILENAME" -ldflags "$LDFLAGS" ./cmd/involucro
     file "$FILENAME"
 
-elif [[ "$MODE" == "cross-arm" ]]; then
-    CGO_ENABLED=0 GOARCH=arm go build -o "$FILENAME" -ldflags "$LDFLAGS" ./cmd/involucro
+elif [[ "$MODE" == "linux-arm64" ]]; then
+    CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o "$FILENAME" -ldflags "$LDFLAGS" ./cmd/involucro
+    file "$FILENAME"
+
+elif [[ "$MODE" == "linux-arm-v7" ]]; then
+    CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o "$FILENAME" -ldflags "$LDFLAGS" ./cmd/involucro
     file "$FILENAME"
 
 else
