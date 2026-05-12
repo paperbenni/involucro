@@ -9,19 +9,12 @@ on:
   pull_request:
 
 env:
-  # Legacy GOPATH project without go.mod; remove this when the repo moves to Go modules.
-  GO111MODULE: "off"
-  GO15VENDOREXPERIMENT: "1"
-  GO_VERSION: "1.13"
-  GOPATH: ${{ github.workspace }}/go
+  GOFLAGS: -mod=readonly
 
 jobs:
   unit:
     name: Unit (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        working-directory: go/src/github.com/involucro/involucro
     strategy:
       fail-fast: false
       matrix:
@@ -36,12 +29,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: go/src/github.com/involucro/involucro
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-          # GOPATH/vendor mode has no go.sum for setup-go's module cache.
-          cache: false
+          go-version-file: go.mod
       - name: Test and build
         env:
           MODE: unit
@@ -50,25 +40,19 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.filename }}
-          path: go/src/github.com/involucro/involucro/${{ matrix.filename }}
+          path: ${{ matrix.filename }}
           if-no-files-found: error
 
   integration:
     name: Integration
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: go/src/github.com/involucro/involucro
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: go/src/github.com/involucro/involucro
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-          # GOPATH/vendor mode has no go.sum for setup-go's module cache.
-          cache: false
+          go-version-file: go.mod
       - name: Docker diagnostics
         run: |
           docker version
@@ -109,25 +93,20 @@ jobs:
     runs-on: windows-latest
     env:
       CGO_ENABLED: "0"
-      GOPATH: ${{ github.workspace }}\go
     defaults:
       run:
         shell: pwsh
-        working-directory: go/src/github.com/involucro/involucro
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: go/src/github.com/involucro/involucro
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-          # GOPATH/vendor mode has no go.sum for setup-go's module cache.
-          cache: false
+          go-version-file: go.mod
       - name: Build version resources
         run: |
-          go get -u github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-          & "$env:GOPATH\bin\goversioninfo.exe" "-product-version=$(git describe --tags --always)"
+          go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0
+          & "$(go env GOPATH)\bin\goversioninfo.exe" "-product-version=$(git describe --tags --always)"
       - name: Build
         run: |
           go build -o involucro.exe -ldflags "-s -w -X github.com/involucro/involucro/app.version=$(git describe --tags --always)" ./cmd/involucro
@@ -138,9 +117,6 @@ jobs:
   cross-build:
     name: Cross-build (${{ matrix.name }})
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: go/src/github.com/involucro/involucro
     strategy:
       fail-fast: false
       matrix:
@@ -164,12 +140,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: go/src/github.com/involucro/involucro
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ env.GO_VERSION }}
-          # GOPATH/vendor mode has no go.sum for setup-go's module cache.
-          cache: false
+          go-version-file: go.mod
       - name: Build
         env:
           MODE: ${{ matrix.mode }}
@@ -189,7 +162,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
-          path: go/src/github.com/involucro/involucro/ci-artifacts/*
+          path: ci-artifacts/*
           if-no-files-found: error
 
   release:
@@ -207,7 +180,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          path: go/src/github.com/involucro/involucro
       - uses: actions/download-artifact@v4
         with:
           path: dist
