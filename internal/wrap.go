@@ -295,7 +295,7 @@ func rebaseFilename(oldprefix, newprefix string, filename string) string {
 	if err != nil {
 		ilog.Warn.Logf("Unable to relativize %s with base %s: %v", filename, oldprefix, err)
 	}
-	return path.Join(newprefix, withoutOld)
+	return path.Join(newprefix, filepath.ToSlash(withoutOld))
 }
 
 func (img asImage) forRemoteExecution() Step {
