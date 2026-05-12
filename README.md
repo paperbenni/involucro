@@ -2,7 +2,6 @@
 # Involucro - Build and Deliver Software with Containers
 
 [![CI](https://github.com/involucro/involucro/actions/workflows/ci.yml/badge.svg)](https://github.com/involucro/involucro/actions/workflows/ci.yml)
-[![Build Status](https://semaphoreci.com/api/v1/thriqon/involucro/branches/master/badge.svg)](https://semaphoreci.com/involucro/involucro)
 [![Go Report Card](https://goreportcard.com/badge/github.com/involucro/involucro)](https://goreportcard.com/report/github.com/involucro/involucro)
 [![Gitter](https://badges.gitter.im/involucro/involucro.svg)](https://gitter.im/involucro/involucro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
