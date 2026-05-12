@@ -11,25 +11,8 @@ inv.task("wrap-yourself")
 	.using("busybox:latest")
 	.run("rm", "-rf", "dist")
 
-local is_pull_request = ENV.TRAVIS_PULL_REQUEST
-if is_pull_request == "" and ENV.GITHUB_ACTIONS == "true" then
-	is_pull_request = ENV.GITHUB_EVENT_NAME == "pull_request" and "true" or "false"
-end
-
-if is_pull_request == "false" then
-	local tag = ENV.TRAVIS_TAG
-
-	if tag == "" and ENV.GITHUB_REF_TYPE == "tag" then
-		tag = ENV.GITHUB_REF_NAME
-	end
-
-	if tag == "" then
-		tag = ENV.TRAVIS_BRANCH
-	end
-
-	if tag == "" and ENV.GITHUB_REF_TYPE == "branch" then
-		tag = ENV.GITHUB_REF_NAME
-	end
+if ENV.GITHUB_ACTIONS == "true" and ENV.GITHUB_EVENT_NAME ~= "pull_request" then
+	local tag = ENV.GITHUB_REF_NAME
 
 	if tag == "main" then
 		tag = "latest"
