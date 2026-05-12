@@ -20,8 +20,9 @@ integration)
     ;;
 
 windows-amd64)
-    go get -u github.com/josephspurrier/goversioninfo/cmd/goversioninfo
-    "$GOPATH"/bin/goversioninfo "-product-version=$VERSION"
+    mkdir -p .bin
+    env GOFLAGS= GOBIN="$PWD/.bin" go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0
+    ./.bin/goversioninfo "-product-version=$VERSION"
 
     CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o involucro.exe -ldflags "$LDFLAGS" ./cmd/involucro
     file involucro.exe

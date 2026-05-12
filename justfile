@@ -4,8 +4,8 @@ default:
     @just --list
 
 format:
-    gofmt -w $(find . -path ./vendor -prune -o -name '*.go' -print)
+    gofmt -w $(find . -name '*.go' -print)
     shfmt -i 4 -w ci/*.sh
-    stylua $(find . -path ./vendor -prune -o -name '*.lua' -print)
+    stylua $(find . -name '*.lua' -print)
     prettier --write .github/workflows/*.yml
     just --fmt --justfile justfile

@@ -105,8 +105,11 @@ jobs:
           go-version-file: go.mod
       - name: Build version resources
         run: |
+          New-Item -ItemType Directory -Force .bin | Out-Null
+          $env:GOFLAGS = ""
+          $env:GOBIN = "$(Get-Location)\.bin"
           go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.7.0
-          & "$(go env GOPATH)\bin\goversioninfo.exe" "-product-version=$(git describe --tags --always)"
+          & ".\.bin\goversioninfo.exe" "-product-version=$(git describe --tags --always)"
       - name: Build
         run: |
           go build -o involucro.exe -ldflags "-s -w -X github.com/involucro/involucro/app.version=$(git describe --tags --always)" ./cmd/involucro

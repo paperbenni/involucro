@@ -143,6 +143,9 @@ func TestAllPropertiesHostConfig(t *testing.T) {
 			OomKillDisable = true
 		}`
 
+	memorySwappiness := int64(293)
+	oomKillDisable := true
+
 	expected := docker.HostConfig{
 		Binds:       []string{"/data:asd"},
 		CapAdd:      []string{"CAP_ROOT"},
@@ -173,12 +176,12 @@ func TestAllPropertiesHostConfig(t *testing.T) {
 		BlkioWeight:      int64(291),
 		Memory:           int64(291),
 		MemorySwap:       int64(292),
-		MemorySwappiness: int64(293),
+		MemorySwappiness: &memorySwappiness,
 
 		Privileged:      true,
 		PublishAllPorts: true,
 		ReadonlyRootfs:  true,
-		OOMKillDisable:  true,
+		OOMKillDisable:  &oomKillDisable,
 	}
 	state := lua.NewState()
 	if err := lua.DoString(state, source); err != nil {

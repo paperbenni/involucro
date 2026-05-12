@@ -37,8 +37,8 @@ One Process, One Container.
 
 From source:
 
-    $ go get github.com/involucro/involucro/cmd/involucro
-    $ $GOPATH/bin/involucro --version
+    $ go install github.com/involucro/involucro/cmd/involucro@latest
+    $ involucro --version
 
 As binary for Linux:
 [involucro](https://github.com/involucro/involucro/releases/download/latest/involucro)
