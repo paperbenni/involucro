@@ -52,21 +52,11 @@ jobs:
           if-no-files-found: error
 
   integration:
-    name: Integration (${{ matrix.name }})
+    name: Integration
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: go/src/github.com/involucro/involucro
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: docker-latest
-            source: get.docker.com
-            publish: true
-          - name: docker-hosted
-            source: ""
-            publish: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,16 +66,17 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: false
-      - name: Install Docker from ${{ matrix.source }}
-        if: ${{ matrix.source != '' }}
-        run: curl -fsSL "https://${{ matrix.source }}/" | sudo sh
+      - name: Docker diagnostics
+        run: |
+          docker version
+          docker info
       - name: Test, build, and wrap
         env:
           MODE: integration
           FILENAME: involucro
         run: ./ci/build.sh
       - name: Configure Docker Hub credentials
-        if: ${{ matrix.publish && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
+        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
         env:
           HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
         run: |
@@ -95,7 +86,7 @@ jobs:
           fi
           printf '{"auths": ["%s"]}\n' "$HUB_TOKEN" > ~/.involucro
       - name: Publish Docker image
-        if: ${{ matrix.publish && github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
+        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
         run: ./involucro upload-to-hub
 
   cross-build:
