@@ -1,7 +1,7 @@
 
 # Involucro - Build and Deliver Software with Containers
 
-[![Build Status](https://travis-ci.org/involucro/involucro.svg?branch=master)](https://travis-ci.org/involucro/involucro)
+[![CI](https://github.com/involucro/involucro/actions/workflows/ci.yml/badge.svg)](https://github.com/involucro/involucro/actions/workflows/ci.yml)
 [![Build Status](https://semaphoreci.com/api/v1/thriqon/involucro/branches/master/badge.svg)](https://semaphoreci.com/involucro/involucro)
 [![Build status](https://ci.appveyor.com/api/projects/status/ice63amutmub3qqr/branch/master?svg=true)](https://ci.appveyor.com/project/JonasWeber/involucro/branch/master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/involucro/involucro)](https://goreportcard.com/report/github.com/involucro/involucro)
@@ -243,4 +243,3 @@ password in plaintext!
 ## Trademarks
 
 Docker® is a registered trademark of Docker, Inc.
-
