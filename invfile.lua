@@ -1,16 +1,15 @@
+local repo = "involucro/tool"
 
-local repo = 'involucro/tool'
-
-inv.task('wrap-yourself')
-	.using('busybox:latest')
-		.run('mkdir', '-p', 'dist/tmp/')
-		.run('cp', 'involucro', 'dist/')
-	.wrap('dist').at('/')
-		.withConfig({entrypoint = {'/involucro'}})
-		.as(repo .. ':latest')
-	.using('busybox:latest')
-		.run('rm', '-rf', 'dist')
-
+inv.task("wrap-yourself")
+	.using("busybox:latest")
+	.run("mkdir", "-p", "dist/tmp/")
+	.run("cp", "involucro", "dist/")
+	.wrap("dist")
+	.at("/")
+	.withConfig({ entrypoint = { "/involucro" } })
+	.as(repo .. ":latest")
+	.using("busybox:latest")
+	.run("rm", "-rf", "dist")
 
 local is_pull_request = ENV.TRAVIS_PULL_REQUEST
 if is_pull_request == "" and ENV.GITHUB_ACTIONS == "true" then
@@ -32,12 +31,9 @@ if is_pull_request == "false" then
 		tag = ENV.GITHUB_REF_NAME
 	end
 
-	if tag == "master" then
+	if tag == "main" then
 		tag = "latest"
 	end
 
-	inv.task('upload-to-hub')
-		.tag(repo .. ':latest')
-			.as(repo .. ':' .. tag)
-		.push(repo .. ':' .. tag)
+	inv.task("upload-to-hub").tag(repo .. ":latest").as(repo .. ":" .. tag).push(repo .. ":" .. tag)
 end

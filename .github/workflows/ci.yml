@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - "*"
   pull_request:
@@ -76,7 +76,7 @@ jobs:
           FILENAME: involucro
         run: ./ci/build.sh
       - name: Configure Docker Hub credentials
-        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
+        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
         env:
           HUB_TOKEN: ${{ secrets.HUB_TOKEN }}
         run: |
@@ -86,7 +86,7 @@ jobs:
           fi
           printf '{"auths": ["%s"]}\n' "$HUB_TOKEN" > ~/.involucro
       - name: Publish Docker image
-        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) }}
+        if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
         run: ./involucro upload-to-hub
 
   cross-build:

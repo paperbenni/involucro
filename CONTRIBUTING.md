@@ -38,8 +38,8 @@ opened using [this form](https://github.com/involucro/involucro/issues/new).
     $ git merge upstream/dev
   ```
 
-* Additions of new features to the code base should be pushed to the `master` branch (`git
-  checkout master`).
+* Additions of new features to the code base should be pushed to the `main` branch (`git
+  checkout main`).
 
 * If your changes modify code - please ensure the resulting files
   conform to the Go [guidelines](https://gobyexample.com/).
