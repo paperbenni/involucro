@@ -1,3 +1,1 @@
-
-inv.task('greet')
-	.using('busybox').run('echo', 'Hello, World!')
+inv.task("greet").using("busybox").run("echo", "Hello, World!")
