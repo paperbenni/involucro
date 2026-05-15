@@ -9,3 +9,6 @@ format:
     stylua $(find . -name '*.lua' -print)
     prettier --write .github/workflows/*.yml
     just --fmt --justfile justfile
+
+install:
+    go install ./cmd/involucro
