@@ -117,3 +117,29 @@ func TestWrapTaskDefinition(t *testing.T) {
 		t.Error("Parent image is unexpected", wi.ParentImage)
 	}
 }
+
+func TestWrapTaskDefinitionWithPlatform(t *testing.T) {
+	inv := newEmpty()
+	if err := inv.RunString(`inv.task('w').wrap("dist").inImage("p").withPlatform('linux/arm64').as("test/one")`); err != nil {
+		t.Fatal("Unable to run code", err)
+	}
+	if len(inv.tasks["w"]) == 0 {
+		t.Fatal("w has no steps")
+	}
+	if p := inv.tasks["w"][0].(asImage).Platform; p != "linux/arm64" {
+		t.Error("Platform is not linux/arm64, but", p)
+	}
+}
+
+func TestWrapTaskInheritsGlobalPlatform(t *testing.T) {
+	inv := New(make(map[string]string), nil, ".", "linux/arm64")
+	if err := inv.RunString(`inv.task('w').wrap("dist").inImage("p").as("test/one")`); err != nil {
+		t.Fatal("Unable to run code", err)
+	}
+	if len(inv.tasks["w"]) == 0 {
+		t.Fatal("w has no steps")
+	}
+	if p := inv.tasks["w"][0].(asImage).Platform; p != "linux/arm64" {
+		t.Error("Platform inheritance failed, expected linux/arm64 but got", p)
+	}
+}

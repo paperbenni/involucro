@@ -11,6 +11,7 @@ var (
 	variables       variablesValue
 	showTasks       bool
 	showVersion     bool
+	platform        string
 
 	remoteWrapTask string
 )
@@ -44,6 +45,8 @@ func initializeFlagSet() {
 	flags.BoolVar(&showTasks, "T", false, "Shorthand for --tasks")
 
 	flags.StringVar(&remoteWrapTask, "wrap", "", "Execute encoded wrap task")
+
+	flags.StringVar(&platform, "platform", "", "Set target platform (e.g. linux/arm64, linux/amd64)")
 
 	flags.BoolVar(&showVersion, "version", false, "Show version and the exit")
 }

@@ -21,7 +21,7 @@ func (m *mockPullable) PullImage(opts docker.PullImageOptions, _ docker.AuthConf
 func TestPull(t *testing.T) {
 	var m mockPullable
 
-	err := pull(&m, "test/asd")
+	err := pull(&m, "test/asd", "")
 	if err != nil {
 		t.Fatal("Err was not nil")
 	}
@@ -30,9 +30,21 @@ func TestPull(t *testing.T) {
 	}
 
 	m.err = errors.New("Mocked error")
-	err = pull(&m, "test/asd2")
+	err = pull(&m, "test/asd2", "")
 
 	if err == nil || err.Error() != m.err.Error() {
 		t.Fatalf("err != m.err: actual %s, expected %s", err, m.err)
+	}
+}
+
+func TestPullWithPlatform(t *testing.T) {
+	var m mockPullable
+
+	err := pull(&m, "test/asd", "linux/arm64")
+	if err != nil {
+		t.Fatal("Err was not nil")
+	}
+	if m.lastPulled.Platform != "linux/arm64" {
+		t.Fatalf("Platform was %q instead of linux/arm64", m.lastPulled.Platform)
 	}
 }

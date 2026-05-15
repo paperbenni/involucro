@@ -263,3 +263,42 @@ func TestProcessLogs(t *testing.T) {
 		t.Error("Unexpected container id", x)
 	}
 }
+
+func TestRunTaskDefinitionWithPlatform(t *testing.T) {
+	inv := newEmpty()
+	if err := inv.RunString(`inv.task('test').using('blah').withPlatform('linux/arm64').run('test')`); err != nil {
+		t.Fatal("Unable to run code", err)
+	}
+	if len(inv.tasks["test"]) != 1 {
+		t.Fatal("test doesn't have exactly one step")
+	}
+	if p := inv.tasks["test"][0].(executeImage).Platform; p != "linux/arm64" {
+		t.Error("Platform is not linux/arm64, but", p)
+	}
+}
+
+func TestRunTaskDefinitionWithPlatformOverride(t *testing.T) {
+	inv := New(make(map[string]string), nil, ".", "linux/amd64")
+	if err := inv.RunString(`inv.task('test').using('blah').withPlatform('linux/arm64').run('test')`); err != nil {
+		t.Fatal("Unable to run code", err)
+	}
+	if len(inv.tasks["test"]) != 1 {
+		t.Fatal("test doesn't have exactly one step")
+	}
+	if p := inv.tasks["test"][0].(executeImage).Platform; p != "linux/arm64" {
+		t.Error("Platform override failed, expected linux/arm64 but got", p)
+	}
+}
+
+func TestRunTaskInheritsGlobalPlatform(t *testing.T) {
+	inv := New(make(map[string]string), nil, ".", "linux/arm64")
+	if err := inv.RunString(`inv.task('test').using('blah').run('test')`); err != nil {
+		t.Fatal("Unable to run code", err)
+	}
+	if len(inv.tasks["test"]) != 1 {
+		t.Fatal("test doesn't have exactly one step")
+	}
+	if p := inv.tasks["test"][0].(executeImage).Platform; p != "linux/arm64" {
+		t.Error("Platform inheritance failed, expected linux/arm64 but got", p)
+	}
+}

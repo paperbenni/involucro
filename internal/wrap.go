@@ -35,10 +35,13 @@ type wrapBuilderState struct {
 	registerStep func(Step)
 }
 
-func newWrapSubBuilder(upper fm, register func(Step)) lua.Function {
+func newWrapSubBuilder(upper fm, register func(Step), platform string) lua.Function {
 	wbs := wrapBuilderState{
 		upper:        upper,
 		registerStep: register,
+		asImage: asImage{
+			Platform: platform,
+		},
 	}
 	return wbs.wrap
 }
@@ -76,13 +79,20 @@ func (wbs wrapBuilderState) withConfig(l *lua.State) int {
 	return wbs.wrapTable(l)
 }
 
+// withPlatform sets the target platform for the new image.
+func (wbs wrapBuilderState) withPlatform(l *lua.State) int {
+	wbs.Platform = lua.CheckString(l, -1)
+	return wbs.wrapTable(l)
+}
+
 // wrapTable builds a Lua table containing the methods for the wrap step.
 func (wbs wrapBuilderState) wrapTable(l *lua.State) int {
 	return tableWith(l, wbs.upper, fm{
-		"inImage":    wbs.inImage,
-		"as":         wbs.as,
-		"at":         wbs.at,
-		"withConfig": wbs.withConfig,
+		"inImage":      wbs.inImage,
+		"as":           wbs.as,
+		"at":           wbs.at,
+		"withConfig":   wbs.withConfig,
+		"withPlatform": wbs.withPlatform,
 	})
 }
 
@@ -91,6 +101,7 @@ func (wbs wrapBuilderState) wrapTable(l *lua.State) int {
 // asImage represents packing up a directory into
 // an image derived from another.
 type asImage struct {
+	Platform          string
 	SourceDir         string
 	TargetDir         string
 	ParentImage       string
@@ -171,7 +182,7 @@ func (img asImage) wrapWithoutBaseImageLocally(i *Runtime) error {
 		return importErr
 	}
 
-	container, err := createContainer(c, docker.Config{Image: intermediateImageRepo, Cmd: []string{"/bin/sh"}}, docker.HostConfig{})
+	container, err := createContainer(c, docker.Config{Image: intermediateImageRepo, Cmd: []string{"/bin/sh"}}, docker.HostConfig{}, img.Platform)
 	if err != nil {
 		return err
 	}
@@ -191,7 +202,7 @@ func (img asImage) wrapWithoutBaseImageLocally(i *Runtime) error {
 func (img asImage) wrapWithBaseImageLocally(i *Runtime) error {
 	c := i.client
 
-	container, err := createContainer(c, docker.Config{Image: img.ParentImage, Cmd: []string{"/bin/sh"}}, docker.HostConfig{})
+	container, err := createContainer(c, docker.Config{Image: img.ParentImage, Cmd: []string{"/bin/sh"}}, docker.HostConfig{}, img.Platform)
 	if err != nil {
 		return err
 	}

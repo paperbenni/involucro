@@ -33,6 +33,12 @@ func Main(args []string) error {
 		}
 	}
 
+	if platform == "" {
+		if val := os.Getenv("INVOLUCRO_PLATFORM"); val != "" {
+			platform = val
+		}
+	}
+
 	if remoteWrapTask != "" {
 		return runRemoteWrapTask()
 	}
@@ -54,7 +60,7 @@ func Main(args []string) error {
 		return fmt.Errorf("Docker not reachable: %s", err)
 	}
 
-	ctx := runtime.New(variables, client, relativeWorkDir)
+	ctx := runtime.New(variables, client, relativeWorkDir, platform)
 
 	if controlScript != "" && isControlFileOverriden() {
 		return fmt.Errorf("Specified both -e and -f")
@@ -111,7 +117,7 @@ func runRemoteWrapTask() error {
 		return err
 	}
 
-	ctx := runtime.New(make(map[string]string), client, "/")
+	ctx := runtime.New(make(map[string]string), client, "/", "")
 	if err := step.Take(&ctx); err != nil {
 		return err
 	}
