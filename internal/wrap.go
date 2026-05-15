@@ -11,6 +11,7 @@ package runtime
 import (
 	"archive/tar"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -155,6 +156,10 @@ func packInto(sourceDir, prefix string) (io.Reader, chan error) {
 }
 
 func (img asImage) wrapWithoutBaseImageLocally(i *Runtime) error {
+	if img.Platform != "" {
+		return fmt.Errorf("wrap without base image does not support platform %q; use .inImage(...) with a matching base image", img.Platform)
+	}
+
 	c := i.client
 	intermediateImageRepo := "image-" + randomIdentifier()
 

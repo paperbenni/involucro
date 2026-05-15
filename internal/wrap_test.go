@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -141,5 +142,22 @@ func TestWrapTaskInheritsGlobalPlatform(t *testing.T) {
 	}
 	if p := inv.tasks["w"][0].(asImage).Platform; p != "linux/arm64" {
 		t.Error("Platform inheritance failed, expected linux/arm64 but got", p)
+	}
+}
+
+func TestWrapWithoutBaseImageRejectsPlatform(t *testing.T) {
+	img := asImage{
+		Platform:          "linux/arm64",
+		SourceDir:         ".",
+		NewRepositoryName: "test/one",
+	}
+	inv := newEmpty()
+
+	err := img.wrapWithoutBaseImageLocally(inv)
+	if err == nil {
+		t.Fatal("Expected platform error")
+	}
+	if !strings.Contains(err.Error(), `wrap without base image does not support platform "linux/arm64"`) {
+		t.Fatalf("Unexpected error: %s", err)
 	}
 }
