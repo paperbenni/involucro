@@ -115,6 +115,10 @@ jobs:
             involucro/tool:${IMAGE_TAG}-arm64 \
             involucro/tool:${IMAGE_TAG}-armv7
 
+          docker manifest annotate involucro/tool:${IMAGE_TAG} involucro/tool:${IMAGE_TAG}-amd64 --os linux --arch amd64
+          docker manifest annotate involucro/tool:${IMAGE_TAG} involucro/tool:${IMAGE_TAG}-arm64 --os linux --arch arm64
+          docker manifest annotate involucro/tool:${IMAGE_TAG} involucro/tool:${IMAGE_TAG}-armv7 --os linux --arch arm --variant v7
+
           docker manifest push involucro/tool:${IMAGE_TAG}
   windows:
     name: Windows amd64
