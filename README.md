@@ -40,7 +40,9 @@ From source:
     $ involucro --version
 
 As binary for Linux:
-[involucro](https://github.com/involucro/involucro/releases/download/latest/involucro)
+[amd64](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-amd64) |
+[arm64](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-arm64) |
+[armv7](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-armv7)
 
 Or, for Windows:
 [involucro.exe](https://github.com/involucro/involucro/releases/download/latest/involucro.exe)
@@ -151,6 +153,10 @@ omitted the resulting image is parent-less. Example:
 to the *withConfig* method of the run step above. This can be used to pre-set
 an entrypoint or exposed ports. Example: `wrapstep.withConfig({exposedports =
 {"80/tcp"}})`.
+
+**wrapstep.withPlatform**`('<PLATFORM>')` (*modifying*) sets the target platform for the resulting
+image. This is useful when building images for architectures other than the one
+running Involucro. Example: `wrapstep.withPlatform('linux/arm64')`.
 
 **wrapstep.as**`('<IMAGE_NAME>')` (*registration*) registers the step for
 execution. The image constructed by the previous modifications is built and
