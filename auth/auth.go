@@ -91,6 +91,10 @@ func forServerWithFile(server string, filename string) (docker.AuthConfiguration
 }
 
 func fromEnv(server string) (docker.AuthConfiguration, bool, error) {
+	if server == "" {
+		server = "index.docker.io/v1/"
+	}
+
 	env := os.Getenv(ENV_NAME)
 	if env != "" {
 		as := strings.Split(env, " ")
