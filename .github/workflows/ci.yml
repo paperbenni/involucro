@@ -81,29 +81,41 @@ jobs:
           MODE: linux-amd64
           FILENAME: involucro
         run: ./ci/build.sh
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish Docker image
+      - name: Build, Wrap and Push multi-arch images
         env:
           IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
+          INVOLUCRO_AUTH: https://${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}@index.docker.io/v1/
         run: |
+          # Setup directories for each architecture
           mkdir -p docker-context/amd64 docker-context/arm64 docker-context/armv7
+
+          # 1. Prepare amd64 (already built)
           cp involucro docker-context/amd64/involucro
 
-          # ARM images use cross-compiled static binaries; integration tests run on linux/amd64.
+          # 2. Build and prepare arm64
           CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o docker-context/arm64/involucro -ldflags "-s -w -X github.com/involucro/involucro/app.version=$(git describe --tags --always)" ./cmd/involucro
+
+          # 3. Build and prepare armv7
           CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -o docker-context/armv7/involucro -ldflags "-s -w -X github.com/involucro/involucro/app.version=$(git describe --tags --always)" ./cmd/involucro
 
-          docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/arm/v7 \
-            --tag "involucro/tool:${IMAGE_TAG}" \
-            --push \
-            --file ci/Dockerfile \
-            .
+          # Build and Push each architecture using Involucro
+          for arch in amd64 arm64 armv7; do
+            echo "Wrapping and Pushing $arch..."
+            TARGETARCH=$arch ./involucro wrap push
+          done
 
+          # Create and push the manifest list using the Docker CLI
+          # These tags must already exist in the registry (pushed by 'involucro push' above)
+          docker manifest create involucro/tool:${IMAGE_TAG} \
+            involucro/tool:${IMAGE_TAG}-amd64 \
+            involucro/tool:${IMAGE_TAG}-arm64 \
+            involucro/tool:${IMAGE_TAG}-armv7
+
+          docker manifest push involucro/tool:${IMAGE_TAG}
   windows:
     name: Windows amd64
     runs-on: windows-latest
