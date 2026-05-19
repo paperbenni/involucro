@@ -156,6 +156,8 @@ func packInto(sourceDir, prefix string) (io.Reader, chan error) {
 }
 
 func (img asImage) wrapWithoutBaseImageLocally(i *Runtime) error {
+	// TODO waiting for https://github.com/fsouza/go-dockerclient/pull/1183 to be
+	// merged; once it is, we can pass Platform to ImportImageOptions.
 	if img.Platform != "" {
 		return fmt.Errorf("wrap without base image does not support platform %q; use .inImage(...) with a matching base image", img.Platform)
 	}
@@ -170,6 +172,7 @@ func (img asImage) wrapWithoutBaseImageLocally(i *Runtime) error {
 
 	packStream, errChan := packInto(sourceDir, img.TargetDir)
 
+	// TODO waiting for https://github.com/fsouza/go-dockerclient/pull/1183 to be merged
 	importErr := c.ImportImage(docker.ImportImageOptions{
 		Repository:  intermediateImageRepo,
 		Tag:         "latest",
