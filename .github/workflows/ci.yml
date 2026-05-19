@@ -89,6 +89,9 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
           INVOLUCRO_AUTH: https://${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}@index.docker.io/v1/
+          # Work around go-dockerclient choosing the minimum option version (1.32)
+          # for platform imports; Docker 29 rejects API versions below 1.44.
+          DOCKER_API_VERSION: "1.44"
         run: |
           # Setup directories for each architecture
           mkdir -p docker-context/amd64 docker-context/arm64 docker-context/armv7
@@ -107,6 +110,11 @@ jobs:
             echo "Wrapping and Pushing $arch..."
             TARGETARCH=$arch ./involucro wrap push
           done
+
+          # Confirm the pushed image configs match the architectures we will publish in the manifest.
+          test "$(docker image inspect involucro/tool:${IMAGE_TAG}-amd64 --format '{{.Os}}/{{.Architecture}}')" = "linux/amd64"
+          test "$(docker image inspect involucro/tool:${IMAGE_TAG}-arm64 --format '{{.Os}}/{{.Architecture}}')" = "linux/arm64"
+          test "$(docker image inspect involucro/tool:${IMAGE_TAG}-armv7 --format '{{.Os}}/{{.Architecture}}/{{.Variant}}')" = "linux/arm/v7"
 
           # Create and push the manifest list using the Docker CLI
           # These tags must already exist in the registry (pushed by 'involucro push' above)
