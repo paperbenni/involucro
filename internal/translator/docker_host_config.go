@@ -75,7 +75,8 @@ func ParseHostConfigFromLuaTable(l *lua.State, conf docker.HostConfig) docker.Ho
 		case "memoryswap":
 			conf.MemorySwap = int64(lua.CheckInteger(l, -1))
 		case "memoryswappiness":
-			conf.MemorySwappiness = int64(lua.CheckInteger(l, -1))
+			swappiness := int64(lua.CheckInteger(l, -1))
+			conf.MemorySwappiness = &swappiness
 
 		case "privileged":
 			conf.Privileged = checkBoolean(l, -1)
@@ -84,7 +85,8 @@ func ParseHostConfigFromLuaTable(l *lua.State, conf docker.HostConfig) docker.Ho
 		case "readonlyrootfs":
 			conf.ReadonlyRootfs = checkBoolean(l, -1)
 		case "oomkilldisable":
-			conf.OOMKillDisable = checkBoolean(l, -1)
+			disable := checkBoolean(l, -1)
+			conf.OOMKillDisable = &disable
 		default:
 			ilog.Warn.Logf("Unrecognized setting [%s] in config, ignoring", lua.CheckString(l, -2))
 		}

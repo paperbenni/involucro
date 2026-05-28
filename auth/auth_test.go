@@ -178,3 +178,22 @@ func TestUseEnvironmentVariableWithoutFile(t *testing.T) {
 		t.Error("Wrong password")
 	}
 }
+
+func TestUseEnvironmentVariableForDockerHubShorthand(t *testing.T) {
+	unsetEnvVariable(t)
+
+	if err := os.Setenv(ENV_NAME, "https://a:b_override@index.docker.io/v1/"); err != nil {
+		t.Fatal(err)
+	}
+
+	ai, found, err := forServerWithFile("", "/tmp/non_existent_file")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !found {
+		t.Fatal("Did not find Docker Hub authentication")
+	}
+	if ai.Username != "a" || ai.Password != "b_override" || ai.ServerAddress != "https://index.docker.io/v1/" {
+		t.Errorf("Unexpected Docker Hub authentication: %#v", ai)
+	}
+}

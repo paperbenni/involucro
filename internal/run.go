@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -19,6 +20,7 @@ import (
 // executeImage executes the given config and host config, similar to "docker
 // run"
 type executeImage struct {
+	Platform              string
 	Config                docker.Config
 	HostConfig            docker.HostConfig
 	ExpectedCode          int
@@ -111,14 +113,15 @@ func (img executeImage) ShowStartInfo() {
 }
 
 func (img executeImage) createContainer(c *docker.Client) (container *docker.Container, err error) {
-	return createContainer(c, img.Config, img.HostConfig)
+	return createContainer(c, img.Config, img.HostConfig, img.Platform)
 }
 
-func createContainer(c *docker.Client, config docker.Config, hostConfig docker.HostConfig) (*docker.Container, error) {
+func createContainer(c *docker.Client, config docker.Config, hostConfig docker.HostConfig, platform string) (*docker.Container, error) {
 	containerName := "step-" + randomIdentifier()
 
 	opts := docker.CreateContainerOptions{
 		Name:       containerName,
+		Platform:   platform,
 		Config:     &config,
 		HostConfig: &hostConfig,
 	}
@@ -131,11 +134,17 @@ func createContainer(c *docker.Client, config docker.Config, hostConfig docker.H
 	}
 
 	if err != docker.ErrNoSuchImage {
-		return nil, err
+		var apiErr *docker.Error
+		if errors.As(err, &apiErr) && apiErr.Status == 404 && strings.Contains(apiErr.Message, "does not provide the specified platform") {
+			ilog.Debug.Logf("Image [%s] has wrong platform, pulling [%s]", config.Image, platform)
+		} else {
+			return nil, err
+		}
+	} else {
+		ilog.Debug.Logf("Image [%s] not present, pulling it", config.Image)
 	}
 
-	ilog.Debug.Logf("Image [%s] not present, pulling it", config.Image)
-	if err := pull(c, config.Image); err != nil {
+	if err := pull(c, config.Image, platform); err != nil {
 		return nil, err
 	}
 
@@ -148,11 +157,12 @@ type usingBuilderState struct {
 	registerStep func(Step)
 }
 
-func newRunSubBuilder(upper fm, register func(Step)) lua.Function {
+func newRunSubBuilder(upper fm, register func(Step), platform string) lua.Function {
 	ubs := usingBuilderState{
 		registerStep: register,
 		upper:        upper,
 		executeImage: executeImage{
+			Platform: platform,
 			HostConfig: docker.HostConfig{
 				Binds: []string{
 					"./:/source",
@@ -170,6 +180,7 @@ func (ubs usingBuilderState) usingTable(l *lua.State) int {
 		"withExpectation": ubs.usingWithExpectation,
 		"withConfig":      ubs.withConfig,
 		"withHostConfig":  ubs.withHostConfig,
+		"withPlatform":    ubs.withPlatform,
 	})
 }
 
@@ -241,6 +252,11 @@ func (ubs usingBuilderState) withConfig(l *lua.State) int {
 
 func (ubs usingBuilderState) withHostConfig(l *lua.State) int {
 	ubs.HostConfig = translator.ParseHostConfigFromLuaTable(l, ubs.HostConfig)
+	return ubs.usingTable(l)
+}
+
+func (ubs usingBuilderState) withPlatform(l *lua.State) int {
+	ubs.Platform = lua.CheckString(l, -1)
 	return ubs.usingTable(l)
 }
 

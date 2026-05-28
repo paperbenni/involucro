@@ -15,6 +15,6 @@ func TestMain(m *testing.M) {
 }
 
 func newEmpty() *Runtime {
-	r := New(make(map[string]string), nil, ".")
+	r := New(make(map[string]string), nil, ".", "")
 	return &r
 }

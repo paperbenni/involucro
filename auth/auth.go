@@ -9,10 +9,9 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"runtime"
 	"strings"
 
-	"github.com/fsouza/go-dockerclient"
+	docker "github.com/fsouza/go-dockerclient"
 )
 
 const ENV_NAME = "INVOLUCRO_AUTH"
@@ -32,7 +31,7 @@ func (a *authenticationInfo) UnmarshalString(s string) error {
 	a.Username = u.User.Username()
 	a.Password, _ = u.User.Password()
 
-	if u.Host + u.Path == "index.docker.io/v1/" {
+	if u.Host+u.Path == "index.docker.io/v1/" {
 		a.ServerAddress = u.Host + u.Path
 	} else {
 		a.ServerAddress = u.Host
@@ -70,7 +69,11 @@ func getAllFrom(r io.Reader) ([]authenticationInfo, error) {
 // However, if an error other than file not found occurs, this error will be
 // returned and the value of the other values is undefined.
 func ForServer(server string) (docker.AuthConfiguration, bool, error) {
-	return forServerWithFile(server, path.Join(userHomeDir(), ".involucro"))
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return docker.AuthConfiguration{}, false, err
+	}
+	return forServerWithFile(server, path.Join(home, ".involucro"))
 }
 
 func forServerWithFile(server string, filename string) (docker.AuthConfiguration, bool, error) {
@@ -88,6 +91,10 @@ func forServerWithFile(server string, filename string) (docker.AuthConfiguration
 }
 
 func fromEnv(server string) (docker.AuthConfiguration, bool, error) {
+	if server == "" {
+		server = "index.docker.io/v1/"
+	}
+
 	env := os.Getenv(ENV_NAME)
 	if env != "" {
 		as := strings.Split(env, " ")
@@ -127,15 +134,4 @@ func forServerInFile(server string, file io.Reader) (docker.AuthConfiguration, b
 	}
 
 	return docker.AuthConfiguration{}, false, nil
-}
-
-func userHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }

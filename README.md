@@ -1,9 +1,7 @@
 
 # Involucro - Build and Deliver Software with Containers
 
-[![Build Status](https://travis-ci.org/involucro/involucro.svg?branch=master)](https://travis-ci.org/involucro/involucro)
-[![Build Status](https://semaphoreci.com/api/v1/thriqon/involucro/branches/master/badge.svg)](https://semaphoreci.com/involucro/involucro)
-[![Build status](https://ci.appveyor.com/api/projects/status/ice63amutmub3qqr/branch/master?svg=true)](https://ci.appveyor.com/project/JonasWeber/involucro/branch/master)
+[![CI](https://github.com/involucro/involucro/actions/workflows/ci.yml/badge.svg)](https://github.com/involucro/involucro/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/involucro/involucro)](https://goreportcard.com/report/github.com/involucro/involucro)
 [![Gitter](https://badges.gitter.im/involucro/involucro.svg)](https://gitter.im/involucro/involucro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
@@ -38,15 +36,16 @@ One Process, One Container.
 
 From source:
 
-    $ go get github.com/involucro/involucro/cmd/involucro
-    $ $GOPATH/bin/involucro --version
+    $ go install github.com/involucro/involucro/cmd/involucro@latest
+    $ involucro --version
 
 As binary for Linux:
-[involucro](https://github.com/involucro/involucro/releases/download/latest/involucro)
+[amd64](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-amd64) |
+[arm64](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-arm64) |
+[armv7](https://github.com/involucro/involucro/releases/download/latest/involucro.linux-armv7)
 
 Or, for Windows:
 [involucro.exe](https://github.com/involucro/involucro/releases/download/latest/involucro.exe)
-[involucro32.exe](https://github.com/involucro/involucro/releases/download/latest/involucro32.exe)
 
 And for Mac OSX:
 [involucro.darwin](https://github.com/involucro/involucro/releases/download/latest/involucro.darwin)
@@ -155,6 +154,10 @@ to the *withConfig* method of the run step above. This can be used to pre-set
 an entrypoint or exposed ports. Example: `wrapstep.withConfig({exposedports =
 {"80/tcp"}})`.
 
+**wrapstep.withPlatform**`('<PLATFORM>')` (*modifying*) sets the target platform for the resulting
+image. This is useful when building images for architectures other than the one
+running Involucro. Example: `wrapstep.withPlatform('linux/arm64')`.
+
 **wrapstep.as**`('<IMAGE_NAME>')` (*registration*) registers the step for
 execution. The image constructed by the previous modifications is built and
 tagged with the given name, which may include a registry designation. Example:
@@ -243,4 +246,3 @@ password in plaintext!
 ## Trademarks
 
 Docker® is a registered trademark of Docker, Inc.
-

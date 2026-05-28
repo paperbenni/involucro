@@ -38,8 +38,8 @@ opened using [this form](https://github.com/involucro/involucro/issues/new).
     $ git merge upstream/dev
   ```
 
-* Additions of new features to the code base should be pushed to the `master` branch (`git
-  checkout master`).
+* Additions of new features to the code base should be pushed to the `main` branch (`git
+  checkout main`).
 
 * If your changes modify code - please ensure the resulting files
   conform to the Go [guidelines](https://gobyexample.com/).
@@ -58,6 +58,6 @@ opened using [this form](https://github.com/involucro/involucro/issues/new).
    * A description of how to test the changes.
 
 * The pull request should pass all the continuous integration tests which are
-  automatically run by GitHub using e.g. Travis CI.
+  automatically run by GitHub Actions.
 
 * After reviewing your pull request and optional discussions we will merge it into the main branch.

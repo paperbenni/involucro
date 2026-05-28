@@ -26,7 +26,7 @@ type progress struct {
 
 // pull pulls the image with the given identifier from
 // the repository
-func pull(c pullimager, repositoryName string) error {
+func pull(c pullimager, repositoryName string, platform string) error {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	defer wg.Wait()
@@ -58,6 +58,7 @@ func pull(c pullimager, repositoryName string) error {
 
 	pio := docker.PullImageOptions{
 		Repository:    repositoryName,
+		Platform:      platform,
 		OutputStream:  pipeWriter,
 		RawJSONStream: true,
 	}

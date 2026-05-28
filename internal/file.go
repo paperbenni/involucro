@@ -11,23 +11,31 @@ import (
 
 // Runtime encapsulates the state of the tool
 type Runtime struct {
-	lua     *lua.State
-	tasks   map[string][]Step
-	Values  map[string]string
-	client  *docker.Client
-	workDir string
+	lua      *lua.State
+	tasks    map[string][]Step
+	Values   map[string]string
+	client   *docker.Client
+	workDir  string
+	Platform string
 }
 
 // New creates a new Runtime and returns it. This new context uses the
 // working dir that is passed as a parameter.  After instantiation, the context
 // will be ready to load additional files.
-func New(values map[string]string, c *docker.Client, workDir string) Runtime {
+func New(values map[string]string, c *docker.Client, workDir string, platform string) Runtime {
+	if values == nil {
+		values = make(map[string]string)
+	}
+	if platform != "" {
+		values["platform"] = platform
+	}
 	m := Runtime{
-		lua:     lua.NewStateEx(),
-		tasks:   make(map[string][]Step),
-		Values:  values,
-		client:  c,
-		workDir: workDir,
+		lua:      lua.NewStateEx(),
+		tasks:    make(map[string][]Step),
+		Values:   values,
+		client:   c,
+		workDir:  workDir,
+		Platform: platform,
 	}
 
 	tableWith(m.lua, fm{"task": m.task})
@@ -114,8 +122,8 @@ func (inv *Runtime) task(l *lua.State) int {
 	subbuilders := make(map[string]lua.Function)
 	subbuilders["task"] = inv.task
 
-	subbuilders["using"] = newRunSubBuilder(subbuilders, registerStep)
-	subbuilders["wrap"] = newWrapSubBuilder(subbuilders, registerStep)
+	subbuilders["using"] = newRunSubBuilder(subbuilders, registerStep, inv.Platform)
+	subbuilders["wrap"] = newWrapSubBuilder(subbuilders, registerStep, inv.Platform)
 	subbuilders["runTask"] = newRuntaskSubBuilder(subbuilders, registerStep)
 	subbuilders["tag"] = newTagSubBuilder(subbuilders, registerStep)
 	subbuilders["hook"] = newHookSubBuilder(subbuilders, registerStep)

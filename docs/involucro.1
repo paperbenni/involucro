@@ -1,4 +1,4 @@
-.TH INVOLUCRO 1 "2016-01-21" "1.0"
+.TH INVOLUCRO 1 "2026-05-18" "1.2"
 .SH NAME
 involucro \- build and deliver software with containers
 .SH SYNOPSIS
@@ -163,6 +163,11 @@ omitted the resulting image is parent-less. Example:
 to the \fIwithConfig\fR method of the run step above. This can be used to pre-set
 an entrypoint or exposed ports. Example: \fIwrapstep.withConfig({exposedports =
 {"80/tcp"}})\fR.
+.LP
+\fIwrapstep.withPlatform(\fB'<PLATFORM>'\fI)\fR (\fImodifying\fR) sets the
+target platform for the resulting image. This is useful when building images
+for architectures other than the one running Involucro. Example:
+\fIwrapstep.withPlatform('linux/arm64')\fR.
 .LP
 \fIwrapstep.as(\fB'<IMAGE_NAME>'\fI)\fR (\fIregistration\fR) registers the step for
 execution. The image constructed by the previous modifications is built and
