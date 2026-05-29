@@ -85,17 +85,17 @@ jobs:
           MODE: linux-amd64
           FILENAME: involucro
         run: ./ci/build.sh
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
-          username: bgruening
+          username: $oauthtoken
           # username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.OAUTH_TOKEN }}
           # password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build, Wrap and Push multi-arch images
         env:
           IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'latest' }}
-          INVOLUCRO_AUTH: https://bgruening:${{ secrets.OAUTH_TOKEN }}@${{ env.REGISTRY }}
+          INVOLUCRO_AUTH: https://$oauthtoken:${{ secrets.OAUTH_TOKEN }}@${{ env.REGISTRY }}
           # INVOLUCRO_AUTH: https://${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}@index.docker.io/v1/
           # Work around go-dockerclient choosing the minimum option version (1.32)
           # for platform imports; Docker 29 rejects API versions below 1.44.
