@@ -18,7 +18,7 @@ import (
 	"strings"
 
 	"github.com/Shopify/go-lua"
-	"github.com/fsouza/go-dockerclient"
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/involucro/involucro/ilog"
 	"github.com/involucro/involucro/internal/translator"
 )
@@ -323,7 +323,7 @@ func (img asImage) forRemoteExecution() Step {
 
 	return executeImage{
 		Config: docker.Config{
-			Image: "involucro/tool:latest",
+			Image: "quay.io/bgruening/involucro:latest",
 			Cmd:   []string{"--wrap", string(encoded)},
 		},
 		HostConfig: docker.HostConfig{

@@ -1,4 +1,5 @@
-local repo = "involucro/tool"
+-- local repo = "involucro/tool"
+local repo = "quay.io/bgruening/involucro"
 
 local tag = ENV.IMAGE_TAG or "latest"
 local arch = ENV.TARGETARCH or "amd64"
