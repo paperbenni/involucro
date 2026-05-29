@@ -310,6 +310,10 @@ func rebaseFilename(oldprefix, newprefix string, filename string) string {
 	return path.Join(newprefix, filepath.ToSlash(withoutOld))
 }
 
+const defaultRegistry = "quay.io/bgruening"
+
+// const defaultRegistry = "involucro"
+
 func (img asImage) forRemoteExecution() Step {
 	dockerSocket := "/var/run/docker.sock"
 
@@ -323,8 +327,9 @@ func (img asImage) forRemoteExecution() Step {
 
 	return executeImage{
 		Config: docker.Config{
-			Image: "quay.io/bgruening/involucro:latest",
-			Cmd:   []string{"--wrap", string(encoded)},
+			Image: defaultRegistry + "/involucro:latest",
+			// Image: "involucro/tool:latest",
+			Cmd: []string{"--wrap", string(encoded)},
 		},
 		HostConfig: docker.HostConfig{
 			Binds: []string{
