@@ -18,7 +18,7 @@ import (
 	"strings"
 
 	"github.com/Shopify/go-lua"
-	docker "github.com/fsouza/go-dockerclient"
+	"github.com/fsouza/go-dockerclient"
 	"github.com/involucro/involucro/ilog"
 	"github.com/involucro/involucro/internal/translator"
 )
